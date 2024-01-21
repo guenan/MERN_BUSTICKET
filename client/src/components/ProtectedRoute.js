@@ -5,6 +5,7 @@ import {message} from "antd";
 import {useDispatch} from "react-redux";
 import {SetUser} from "../redux/usersSlice";
 import {HideLoading, ShowLoading} from "../redux/alertsSlice";
+import DefaultLayout from "./DefaultLayout";
 
 function ProtectedRoute({children}) {
     const dispatch = useDispatch();
@@ -49,7 +50,7 @@ function ProtectedRoute({children}) {
 
     return (
         <div>
-            { <>{children}</>}
+            { <DefaultLayout>{children}</DefaultLayout>}
         </div>
     );
 }
