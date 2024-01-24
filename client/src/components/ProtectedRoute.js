@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {useNavigate} from "react-router-dom";
 import axios from "axios";
 import {message} from "antd";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {SetUser} from "../redux/usersSlice";
 import {HideLoading, ShowLoading} from "../redux/alertsSlice";
 import DefaultLayout from "./DefaultLayout";
@@ -10,6 +10,7 @@ import DefaultLayout from "./DefaultLayout";
 function ProtectedRoute({children}) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const { user } = useSelector((state) => state.users);
 
     const validateToken = async () => {
         try {
@@ -48,9 +49,18 @@ function ProtectedRoute({children}) {
         }
     }, []);
 
+    useEffect(() => {
+        if (window.location.pathname.includes("admin")) {
+            if (!user?.isAdmin) {
+                message.error("You are not authorized to access this page");
+                window.location.href = "/";
+            }
+        }
+    }, [user]);
+
     return (
         <div>
-            { <DefaultLayout>{children}</DefaultLayout>}
+            {user !== null && <DefaultLayout>{children}</DefaultLayout>}
         </div>
     );
 }
