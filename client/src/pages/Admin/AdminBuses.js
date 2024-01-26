@@ -18,7 +18,7 @@ function AdminBuses() {
         try {
             dispatch(ShowLoading());
             // const response = await axiosInstance.get("/api/buses/get-all-buses", {});
-            const response = await axiosInstance.get("/api/buses/get-all-buses");
+            const response = await axiosInstance.post("/api/buses/get-all-buses",{});
             dispatch(HideLoading());
             if (response.data.success) {
                 setBuses(response.data.data);

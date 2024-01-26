@@ -52,12 +52,26 @@ router.post("/delete-bus", authMiddleware, async (req, res) => {
     }
 });
 
+const excludeProperty = (originalObject, excludedProperty) => {
+    // Copier toutes les propriétés de l'objet original dans un nouvel objet
+    const newObject = { ...originalObject };
+
+    // Vérifier si la propriété à exclure existe dans l'objet
+    if (excludedProperty in newObject) {
+        // Exclure la propriété spécifiée
+        delete newObject[excludedProperty];
+    }
+    // Retourner le nouvel objet modifié
+    return newObject;
+}
+
+
 // get-all-buses
 
-router.get("/get-all-buses", authMiddleware, async (req, res) => {
+router.post("/get-all-buses", authMiddleware, async (req, res) => {
     try {
-        // const buses = await Bus.find(req.body);
-        const buses = await Bus.find();
+        const criteria = excludeProperty(req.body, "userId");
+        const buses = await Bus.find(criteria);
         return res.status(200).send({
             success: true,
             message: "Buses fetched successfully",
