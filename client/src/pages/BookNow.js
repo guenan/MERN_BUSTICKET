@@ -5,8 +5,7 @@ import {useNavigate, useParams} from "react-router-dom";
 import SeatSelection from "../components/SeatSelection";
 import {axiosInstance} from "../helpers/axiosInstance";
 import {HideLoading, ShowLoading} from "../redux/alertsSlice";
-
-// import StripeCheckout from "react-stripe-checkout";
+ import StripeCheckout from "react-stripe-checkout";
 
 function BookNow() {
     const [selectedSeats, setSelectedSeats] = useState([]);
@@ -24,6 +23,47 @@ function BookNow() {
             dispatch(HideLoading());
             if (response.data.success) {
                 setBus(response.data.data);
+            } else {
+                message.error(response.data.message);
+            }
+        } catch (error) {
+            dispatch(HideLoading());
+            message.error(error.message);
+        }
+    };
+
+    const bookNow = async (transactionId) => {
+        try {
+            dispatch(ShowLoading());
+            const response = await axiosInstance.post("/api/bookings/book-seat", {
+                bus: bus._id,
+                seats: selectedSeats,
+                transactionId,
+            });
+            dispatch(HideLoading());
+            if (response.data.success) {
+                message.success(response.data.message);
+                navigate("/bookings");
+            } else {
+                message.error(response.data.message);
+            }
+        } catch (error) {
+            dispatch(HideLoading());
+            message.error(error.message);
+        }
+    };
+
+    const onToken = async (token) => {
+        try {
+            dispatch(ShowLoading());
+            const response = await axiosInstance.post("/api/bookings/make-payment", {
+                token,
+                amount: selectedSeats.length * bus.fare * 100,
+            });
+            dispatch(HideLoading());
+            if (response.data.success) {
+                message.success(response.data.message);
+                bookNow(response.data.data.transactionId);
             } else {
                 message.error(response.data.message);
             }
@@ -79,16 +119,22 @@ function BookNow() {
                                 Fare : {bus.fare * selectedSeats.length} /-
                             </h1>
                             <hr/>
-
-                            <button
-                                className={`primary-btn ${
-                                    selectedSeats.length === 0 && "disabled-btn"
-                                }`}
-                                disabled={selectedSeats.length === 0}
+                            <StripeCheckout
+                                billingAddress
+                                token={onToken}
+                                amount={bus.fare * selectedSeats.length * 100}
+                                currency="XAF"
+                                stripeKey="pk_test_51Occx0I80AIqjYeArVp5E8hPR7ZkyPWyEM5AdeoeUi1oeO0JhfS9NZrDJ7vu9WStdqvylJyKBorz6udkzIR5LZaX00hOAj7VnI"
                             >
-                                Book Now
-                            </button>
-
+                                <button
+                                    className={`primary-btn ${
+                                        selectedSeats.length === 0 && "disabled-btn"
+                                    }`}
+                                    disabled={selectedSeats.length === 0}
+                                >
+                                    Book Now
+                                </button>
+                            </StripeCheckout>
                         </div>
                     </Col>
                     <Col lg={12} xs={24} sm={24}>
