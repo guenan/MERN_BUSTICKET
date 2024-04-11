@@ -30,7 +30,7 @@ function Login() {
     return (
         <div className="h-screen d-flex justify-content-center align-items-center auth">
             <div className="w-400 card p-3">
-                <h1 className="text-lg">SheyBus - Login</h1>
+                <h1 className="text-lg">NTGA Bus - Login</h1>
                 <hr />
                 <Form layout="vertical" onFinish={onFinish}>
                     <Form.Item label="Email" name="email">
@@ -46,6 +46,9 @@ function Login() {
                         </button>
                     </div>
                 </Form>
+            </div>
+            <div className="w-400 h-400 card">
+                <img src="/images/bus.jpg" alt="bus" className="w-400 h-400"/>
             </div>
         </div>
     );
